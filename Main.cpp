@@ -24,11 +24,12 @@ struct Bug
     string impact;
     string created; // ISO 8601 format e.g. "20180125T011030Z"
 
-    // Parameterized constructor
+    // Creatinng a parameter for bugs
     Bug(string bug_id, string information, string level, string date)
         : id(bug_id), description(information), impact(level), created(date) {}
 
-    // Compare bugs by created date -- oldest date comes first in the BST
+    // Compare bugs by created date
+    // oldest date comes first in the BST
     bool operator<(const Bug &other) const
     {
         return created < other.created;
@@ -69,10 +70,10 @@ int main(int argc, char* argv[])
     }
 
     string inputFile  = argv[1];
-    // stoi converts the command line argument from a string to an integer
+    // using stoi to convert the command line argument from a string to an integer
     int numDevelopers = stoi(argv[2]);
 
-    // Instantiate an xml document
+    // creating an xml document
     pugi::xml_document doc;
 
     // Checking to see if the program can open the xml file
@@ -85,7 +86,6 @@ int main(int argc, char* argv[])
     pugi::xml_node root = doc.first_child();
 
     // Creating a BST for each impact level based on oldest date
-    // The leftmost node in each BST will always be the oldest bug
     BinarySearchTree<Bug> highBST;
     BinarySearchTree<Bug> mediumBST;
     BinarySearchTree<Bug> lowBST;
@@ -119,14 +119,14 @@ int main(int argc, char* argv[])
         }
     }
 
-    // Store bug assignments for each developer in a linked list
+    // Storing bug assigned for each developer in a linked list
     LinkedList<LinkedList<Bug>> developerAssignments;
 
     for (int dev = 0; dev < numDevelopers; ++dev)
     {
         LinkedList<Bug> assignments;
 
-        // Get and remove the oldest high impact bug from BST 1
+        // Geting and remove the oldest high impact bug from BST high impact
         const Bug* highBug = highBST.findMinimum();
         if (highBug != nullptr)
         {
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
             highBST.remove(*highBug);
         }
 
-        // Get and remove the oldest medium impact bug from BST 2
+        // Geting and remove the oldest medium impact bug from BST medium impact
         const Bug* medBug = mediumBST.findMinimum();
         if (medBug != nullptr)
         {
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
             mediumBST.remove(*medBug);
         }
 
-        // Get and remove the oldest low impact bug from BST 3
+        // Geting and remove the oldest low impact bug from BST low impact
         const Bug* lowBug = lowBST.findMinimum();
         if (lowBug != nullptr)
         {
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
         developerAssignments.pushBack(assignments);
     }
 
-    // Open output file for writing
+    // Open output file for the report.xml
     string outputFile = "report.xml";
     ofstream outFile;
     outFile.open(outputFile, ofstream::trunc);
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Write XML declaration and opening report tag
+    // Writing XML declaration and opening report tag
     outFile << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     outFile << "<report>\n";
 
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
         outFile << "    </developer>\n";
     }
 
-    // Write remaining unassigned bugs to <remaining> section
+    // Writing remaining unassigned bugs to <remaining> section based on impact and oldest date
     outFile << "    <remaining>\n";
 
     LinkedList<Bug> remainingHigh   = highBST.getSortedList();
@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
     outFile << "</report>";
     outFile.close();
 
+    //outputing that the infomation was sent to the xml filw
     cout << "The Output was written to " << outputFile << endl;
 
     return 0;
